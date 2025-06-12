@@ -5,17 +5,20 @@ from datetime import datetime
 
 class CartItemAdd(BaseModel):
     """Schemat dodawania produktu do koszyka"""
+
     product_id: int = Field(..., gt=0)
     quantity: int = Field(..., gt=0)
 
 
 class CartItemUpdate(BaseModel):
     """Schemat aktualizacji ilości produktu w koszyku"""
+
     quantity: int = Field(..., gt=0)
 
 
 class CartItemResponse(BaseModel):
     """Schemat odpowiedzi dla produktu w koszyku"""
+
     id: int
     product_id: int
     product_name: str
@@ -30,6 +33,7 @@ class CartItemResponse(BaseModel):
 
 class CartResponse(BaseModel):
     """Schemat odpowiedzi dla koszyka użytkownika"""
+
     items: List[CartItemResponse]
     total_items: int
     total_amount: float
@@ -37,4 +41,5 @@ class CartResponse(BaseModel):
 
 class CartClear(BaseModel):
     """Schemat czyszczenia koszyka"""
-    confirm: bool = Field(True) 
+
+    confirm: bool = Field(True)

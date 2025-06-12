@@ -27,15 +27,20 @@ revoked_tokens: set = set()
 
 # get_db importowane z database.models
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Weryfikacja hasła"""
     return pwd_context.verify(plain_password, hashed_password)
+
 
 def get_password_hash(password: str) -> str:
     """Hashowanie hasła"""
     return pwd_context.hash(password)
 
-def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+
+def create_access_token(
+    data: Dict[str, Any], expires_delta: Optional[timedelta] = None
+) -> str:
     """Tworzenie access tokena"""
     to_encode = data.copy()
     if expires_delta:
@@ -46,7 +51,10 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def create_refresh_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+
+def create_refresh_token(
+    data: Dict[str, Any], expires_delta: Optional[timedelta] = None
+) -> str:
     """Tworzenie refresh tokena"""
     to_encode = data.copy()
     if expires_delta:
@@ -57,6 +65,7 @@ def create_refresh_token(data: Dict[str, Any], expires_delta: Optional[timedelta
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 def decode_refresh_token(token: str) -> Dict[str, Any]:
     """Dekodowanie refresh tokena"""
     try:
@@ -64,54 +73,74 @@ def decode_refresh_token(token: str) -> Dict[str, Any]:
         if payload.get("type") != "refresh":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Nieprawidłowy typ tokena"
+                detail="Nieprawidłowy typ tokena",
             )
         if token in revoked_tokens:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token został unieważniony"
+                detail="Token został unieważniony",
             )
         return payload
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Nie można zweryfikować danych uwierzytelniających"
+            detail="Nie można zweryfikować danych uwierzytelniających",
         )
+
 
 def revoke_refresh_token(token: str) -> None:
     """Unieważnienie refresh tokena"""
     revoked_tokens.add(token)
 
+
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
     """Pobieranie użytkownika po email"""
     return db.query(User).filter(User.email == email).first()
+
 
 def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
     """Pobieranie użytkownika po ID"""
     return db.query(User).filter(User.id == user_id).first()
 
-def create_user(db: Session, email: str, password: str) -> User:
+
+def create_user(
+    db: Session,
+    email: str,
+    password: str,
+    is_admin: bool = False,
+    full_name: str = None,
+) -> User:
     """Tworzenie nowego użytkownika"""
     hashed_password = get_password_hash(password)
+
+    # Jawnie ustawiamy is_admin
+    admin_status = bool(is_admin) if is_admin is not None else False
+
     db_user = User(
         email=email,
         hashed_password=hashed_password,
+        full_name=full_name,
         is_active=True,
-        is_admin=False
+        is_admin=admin_status,
     )
+
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
     return db_user
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
     """Pobieranie obecnego użytkownika z tokena"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Nie można zweryfikować danych uwierzytelniających",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -119,31 +148,30 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     user = get_user_by_id(db, user_id=int(user_id))
     if user is None:
         raise credentials_exception
-    
+
     # Zwracamy obiekt w formacie schematu UserProfile
     from .schemas import UserProfile
+
     return UserProfile(
-        id=user.id,
-        email=user.email,
-        is_active=user.is_active,
-        is_admin=user.is_admin
+        id=user.id, email=user.email, is_active=user.is_active, is_admin=user.is_admin
     )
 
-def get_current_active_user(current_user = Depends(get_current_user)):
+
+def get_current_active_user(current_user=Depends(get_current_user)):
     """Pobieranie aktywnego użytkownika"""
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Nieaktywny użytkownik")
     return current_user
 
-def get_current_admin_user(current_user = Depends(get_current_user)):
+
+def get_current_admin_user(current_user=Depends(get_current_user)):
     """Pobieranie użytkownika z prawami administratora"""
     if not current_user.is_admin:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Niewystarczające uprawnienia"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Niewystarczające uprawnienia"
         )
-    return current_user 
+    return current_user

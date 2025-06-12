@@ -6,6 +6,7 @@ from enum import Enum
 
 class OrderStatus(str, Enum):
     """Statusy zamówienia"""
+
     PENDING = "pending"
     CONFIRMED = "confirmed"
     SHIPPED = "shipped"
@@ -15,11 +16,13 @@ class OrderStatus(str, Enum):
 
 class OrderCreate(BaseModel):
     """Schemat tworzenia zamówienia"""
+
     shipping_address: str = Field(..., min_length=10, max_length=500)
 
 
 class OrderItemResponse(BaseModel):
     """Schemat odpowiedzi dla pozycji zamówienia"""
+
     id: int
     product_id: int
     product_name: str
@@ -33,6 +36,7 @@ class OrderItemResponse(BaseModel):
 
 class OrderResponse(BaseModel):
     """Schemat odpowiedzi dla zamówienia"""
+
     id: int
     user_id: int
     total_amount: float
@@ -48,12 +52,14 @@ class OrderResponse(BaseModel):
 
 class OrderUpdate(BaseModel):
     """Schemat aktualizacji zamówienia"""
+
     status: Optional[OrderStatus] = None
     shipping_address: Optional[str] = Field(None, min_length=10, max_length=500)
 
 
 class OrderListResponse(BaseModel):
     """Schemat odpowiedzi dla listy zamówień"""
+
     id: int
     total_amount: float
     status: OrderStatus
@@ -61,4 +67,4 @@ class OrderListResponse(BaseModel):
     items_count: int
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

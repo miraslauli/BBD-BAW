@@ -5,6 +5,7 @@ from datetime import datetime
 
 class ProductResponse(BaseModel):
     """Schemat odpowiedzi dla produktu"""
+
     id: int
     name: str
     description: Optional[str]
@@ -21,6 +22,7 @@ class ProductResponse(BaseModel):
 
 class CategoryResponse(BaseModel):
     """Schemat odpowiedzi dla kategorii"""
+
     id: int
     name: str
     description: Optional[str]
@@ -33,6 +35,7 @@ class CategoryResponse(BaseModel):
 # Schematy administracyjne dla zarządzania produktami
 class ProductCreate(BaseModel):
     """Schemat tworzenia produktu"""
+
     name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     price: float = Field(..., gt=0)
@@ -43,6 +46,7 @@ class ProductCreate(BaseModel):
 
 class ProductUpdate(BaseModel):
     """Schemat aktualizacji produktu"""
+
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     price: Optional[float] = Field(None, gt=0)
@@ -53,11 +57,13 @@ class ProductUpdate(BaseModel):
 
 class CategoryCreate(BaseModel):
     """Schemat tworzenia kategorii"""
+
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
 
 
 class CategoryUpdate(BaseModel):
     """Schemat aktualizacji kategorii"""
+
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    description: Optional[str] = Field(None, max_length=500) 
+    description: Optional[str] = Field(None, max_length=500)
