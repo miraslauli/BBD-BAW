@@ -128,7 +128,7 @@ curl -X POST "http://localhost:8000/products/admin/" \
   -d '{"name": "Python dla początkujących", "description": "Podręcznik programowania w języku Python", "price": 45.99, "stock_quantity": 100, "category_id": 3, "is_active": true}'
 
 # Pobieranie listy produktów (publiczne - nie wymaga tokena)
-curl -X GET "http://localhost:8000/products"
+curl -X GET "http://localhost:8000/products/"
 
 # Pobieranie szczegółów produktu
 curl -X GET "http://localhost:8000/products/1"
