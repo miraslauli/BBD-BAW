@@ -23,8 +23,8 @@ Miraslau Chyhir
 
 ### 1. Sklonuj repozytorium
 ```bash
-git clone [URL_REPOZYTORIUM]
-cd [NAZWA_PROJEKTU]
+git clone https://github.com/miraslauli/BBD-BAW.git
+cd BBD-BAW
 ```
 
 ### 2. Uruchomienie z użyciem Docker Compose
