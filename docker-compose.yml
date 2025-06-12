@@ -1,0 +1,12 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_fastapi
+    env_file:
+      - .env
+    container_name: fastapi_aszwoj
+    ports:
+      - 8000:8000
+    environment:
+      - PYTHONUNBUFFERED=1

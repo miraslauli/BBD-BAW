@@ -1,0 +1,25 @@
+[project]
+name = "aszwoj-project"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Miraslau Chyhir"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)",
+    "sqlalchemy (>=2.0.41,<3.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "uvicorn (>=0.34.3,<0.35.0)",
+    "email-validator (>=2.2.0,<3.0.0)",
+    "python-jose[cryptography] (>=3.3.0,<4.0.0)",
+    "passlib[bcrypt] (>=1.7.4,<2.0.0)",
+    "pydantic[email] (>=2.5.0,<3.0.0)",
+    "python-multipart (>=0.0.6,<0.1.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

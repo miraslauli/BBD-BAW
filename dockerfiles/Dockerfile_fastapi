@@ -1,0 +1,17 @@
+FROM python:3.12-slim
+
+RUN mkdir /fastapi-aszwoj
+
+WORKDIR /fastapi-aszwoj
+
+COPY ../pyproject.toml .
+
+RUN pip install poetry
+
+RUN poetry config virtualenvs.create false
+
+RUN poetry install --no-root
+
+COPY .. .
+
+CMD gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile_fastapi
+    networks:
+      - app-network
+    environment:
+      - DATABASE_URL=sqlite:///./fastapi_aszwoj.db
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - db-init
+    restart: unless-stopped
+
+  db-init:
+    build:
+      context: .
+      dockerfile: Dockerfile_fastapi
+    command: python -c "from src.database.models import init_db; init_db()"
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app-network
+    restart: "no"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - app-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+      - NET_BIND_SERVICE
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  nginx-logs:
+    driver: local 
