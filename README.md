@@ -7,6 +7,11 @@ Miraslau Chyhir
 - Bezpieczeństwo baz danych
 - Bezpieczeństwo aplikacji webowych
 
+## Przykłady działania programu
+| ![Screenshot 1](screenshots/1.png) | ![Screenshot 2](screenshots/2.png) | ![Screenshot 3](screenshots/3.png) | ![Screenshot 4](screenshots/4.png) |
+|----------------------------------|----------------------------------|----------------------------------|----------------------------------|
+| ![Screenshot 5](screenshots/5.png) | ![Screenshot 6](screenshots/6.png) | ![Screenshot 7](screenshots/7.png) | ![Screenshot 8](screenshots/8.png) |
+
 ## Stos technologiczny
 - **Backend**: FastAPI (Python 3.11+)
 - **Baza danych**: SQLite
@@ -34,10 +39,7 @@ docker-compose up -d
 
 ### 3. Weryfikacja uruchomienia
 ```bash
-# Sprawdź status kontenerów
 docker-compose ps
-
-# Sprawdź logi w przypadku problemów
 docker-compose logs -f api
 ```
 
@@ -197,57 +199,6 @@ curl -X DELETE "http://localhost:8000/cart/clear" \
   -d '{"confirm": true}'
 ```
 
-### 7. Statystyki i monitoring (wymaga tokenu administratora)
-```bash
-# Informacje o tabelach bazy danych
-curl -X GET "http://localhost:8000/database/tables"
-
-# Testowanie indeksów bazy danych
-curl -X GET "http://localhost:8000/database/test-indexes"
-
-# Demonstracja operacji CRUD
-curl -X GET "http://localhost:8000/database/crud-demo"
-```
-
-### 8. Przykład pełnego procesu konfiguracji systemu
-```bash
-# KROK 1: Inicjalizacja bazy danych
-curl -X POST "http://localhost:8000/database/init"
-
-# KROK 2: Pobranie tokena administratora
-ADMIN_TOKEN=$(curl -s -X POST "http://localhost:8000/auth/get-admin-token" | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
-
-# KROK 3: Tworzenie kategorii
-curl -X POST "http://localhost:8000/products/categories/admin/" \
-  -H "Authorization: Bearer $ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Elektronika", "description": "Produkty elektroniczne"}'
-
-# KROK 4: Dodanie produktu
-curl -X POST "http://localhost:8000/products/admin/" \
-  -H "Authorization: Bearer $ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Laptop", "description": "Nowoczesny laptop", "price": 1999.99, "stock_quantity": 10, "category_id": 1, "is_active": true}'
-
-# KROK 5: Sprawdzenie produktów
-curl -X GET "http://localhost:8000/products/11"  # Sprawdzenie konkretnego produktu
-```
-
-### 9. Weryfikacja działania systemu
-```bash
-
-# 1. Sprawdzenie administratora
-curl -X GET "http://localhost:8000/auth/me" -H "Authorization: Bearer $ADMIN_TOKEN"
-
-# 2. Lista kategorii
-curl -X GET "http://localhost:8000/products/categories/"
-
-# 3. Sprawdzenie koszyka użytkownika
-curl -X GET "http://localhost:8000/cart/" -H "Authorization: Bearer [TOKEN_UŻYTKOWNIKA]"
-
-# 4. Test indeksów bazy danych
-curl -X GET "http://localhost:8000/database/test-indexes"
-```
 
 ## Elementy bezpieczeństwa
 
@@ -283,14 +234,3 @@ docker-compose logs --tail=50 api
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
 - **OpenAPI Schema**: `http://localhost:8000/openapi.json`
-
-## Struktura projektu
-```
-src/
-├── auth/           # Moduł autentykacji i autoryzacji
-├── products/       # Zarządzanie produktami i kategoriami
-├── cart/           # Funkcjonalność koszyka
-├── orders/         # System zamówień (jeśli implementowany)
-├── database/       # Modele bazy danych i operacje
-└── main.py         # Punkt wejścia aplikacji
-```
