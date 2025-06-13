@@ -74,12 +74,12 @@ def register_admin(admin: AdminCreate, db: Session = Depends(get_db)):
             detail="Użytkownik z tym adresem email już istnieje",
         )
 
-    # Tworzymy nowego administratora (zawsze z is_admin=True)
+    # Tworzymy nowego administratora
     db_user = create_user(
         db=db,
         email=admin.email,
         password=admin.password,
-        is_admin=True,  # Zawsze True dla administratorów
+        is_admin=True,
         full_name=admin.full_name,
     )
 
